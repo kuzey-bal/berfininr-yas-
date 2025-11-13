@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Berfin’in Rüyası</title>
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(to bottom, #1a0033, #000);
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .game-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      max-width: 600px;
+      padding: 20px;
+      border-radius: 15px;
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+    }
+
+    h1 {
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      from { text-shadow: 0 0 10px #a76cf1; }
+      to { text-shadow: 0 0 25px #d9b3ff; }
+    }
+
+    p {
+      font-size: 1.2em;
+      line-height: 1.6;
+    }
+
+    button {
+      margin: 10px;
+      padding: 12px 30px;
+      font-size: 1em;
+      background-color: #a76cf1;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      color: white;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #c38aff;
+      transform: scale(1.05);
+    }
+
+    canvas {
+      display: none;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container" id="game">
+    <h1>🌙 Berfin’in Rüyası 🌙</h1>
+    <p>Berfin derin bir uykuya dalar... Gözlerini açtığında kendini büyülü bir yerde bulur.</p>
+    <button onclick="choose(1)">Parlayan yola git</button>
+    <button onclick="choose(2)">Sisli ormana yönel</button>
+  </div>
+
+  <canvas id="cryCanvas" width="300" height="200"></canvas>
+
+  <script>
+    const game = document.getElementById('game');
+    const cryCanvas = document.getElementById('cryCanvas');
+    const ctx = cryCanvas.getContext('2d');
+
+    function showScene(title, text, options) {
+      cryCanvas.style.display = "none";
+      game.innerHTML = <h1>${title}</h1><p>${text}</p>;
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.textContent = opt.text;
+        btn.onclick = opt.action;
+        game.appendChild(btn);
+      });
+    }
+
+    function choose(option) {
+      if (option === 1) {
+        showScene(
+          "✨ Parlayan Yol ✨",
+          "Yol boyunca yıldızlar sana yol gösteriyor. Uzakta bir melodi duyuyorsun. Sesin sahibi Kuzey adında biri...",
+          [
+            { text: "Sese doğru git", action: () => sceneKuzey() },
+            { text: "Sessizce bekle", action: () => sceneKuzeyCry("Berfin sessiz kalınca, Kuzey uzakta ağlamaya başlar...") }
+          ]
+        );
+      } else {
+        showScene(
+          "🌫 Sisli Orman 🌫",
+          "Sis arasında bir siluet beliriyor. ‘Berfin, beni bul’ diyen bir ses... Bu bir işaret mi?",
+          [
+            { text: "Sese güven", action: () => sceneKuzey() },
+            { text: "Yoldan geri dön", action: () => sceneKuzeyCry("Berfin geri dönerken, Kuzey’in gözlerinden yaşlar süzülür...") }
+          ]
+        );
+      }
+    }
+
+    function sceneKuzey() {
+      showScene(
+        "💫 Kuzey’in Bahçesi 💫",
+        "Berfin, Kuzey’i bulur. Rüyada tanışırlar, ama sanki onu hep tanıyormuş gibi hisseder. Kuzey ona bir soru sorar: ‘Berfin, bu rüyanın bitmesini ister misin?’",
+        [
+          { text: "Evet, uyanmak istiyorum", action: () => normalEnding() },
+          { text: "Hayır, seninle kalmak istiyorum", action: () => happyEnding() }
+        ]
+      );
+    }
+
+    function sceneKuzeyCry(message) {
+      showScene("😢 Kuzey Ağlıyor 😢", message, [
+        { text: "Kuzey’e dön", action: () => location.reload() }
+      ]);
+      startCryingAnimation();
+    }
+
+    function normalEnding() {
+      showScene(
+        "☀ Uyanış ☀",
+        "Berfin gözlerini açar. Güneş doğmuştur, ama rüyasında duyduğu o sesi asla unutamaz... Kuzey.",
+        [
+          { text: "Rüyaya geri dön", action: () => location.reload() }
+        ]
+      );
+    }
+
+    function happyEnding() {
+      showScene(
+        "💍 Mutlu Son 💍",
+        "Berfin ve Kuzey rüyanın içinde el ele tutuşurlar. Rüya artık bitmez, çünkü gerçek olmuştur. Ve Berfin, Kuzey Balat’la evlenir.",
+        [
+          { text: "💖 Tekrar oyna", action: () => location.reload() }
+        ]
+      );
+    }
+
+    // 🎨 Ağlayan Kuzey animasyonu
+    function startCryingAnimation() {
+      cryCanvas.style.display = "block";
+      let tears = Array.from({ length: 10 }, () => ({
+        x: 140 + Math.random() * 20,
+        y: 70 + Math.random() * 20,
+        speed: 1 + Math.random() * 2
+      }));
+
+      function drawFace() {
+        ctx.clearRect(0, 0, cryCanvas.width, cryCanvas.height);
+
+        // Yüz
+        ctx.fillStyle = "#f2d0ff";
+        ctx.beginPath();
+        ctx.arc(150, 100, 50, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Gözler
+        ctx.fillStyle = "#000";
+        ctx.beginPath();
+        ctx.arc(130, 90, 8, 0, Math.PI * 2);
+        ctx.arc(170, 90, 8, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Ağız
+        ctx.strokeStyle = "#000";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(150, 115, 15, 0, Math.PI, true);
+        ctx.stroke();
+
+        // Gözyaşları
+        ctx.fillStyle = "#6ec6ff";
+        tears.forEach(t => {
+          ctx.beginPath();
+          ctx.arc(t.x, t.y, 3, 0, Math.PI * 2);
+          ctx.fill();
+          t.y += t.speed;
+          if (t.y > 150) t.y = 90;
+        });
+
+        requestAnimationFrame(drawFace);
+      }
+
+      drawFace();
+    }
+  </script>
+</body>
+</html>
